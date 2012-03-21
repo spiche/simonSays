@@ -26,7 +26,7 @@ namespace SkeletalTracking
     /// </summary>
     public partial class MainWindow : Window
     {
-        SolidColorBrush[] colors = { Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.Yellow };
+        SolidColorBrush[] colors = { Brushes.Red, Brushes.Green, Brushes.Blue };
 
         public MainWindow()
         {
