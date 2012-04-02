@@ -17,7 +17,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
-using Coding4Fun.Kinect.Wpf; 
+using Coding4Fun.Kinect.Wpf;
+
+using System.Timers;
+using System.Windows.Threading; 
 
 namespace SkeletalTracking
 {
@@ -26,20 +29,101 @@ namespace SkeletalTracking
     /// </summary>
     public partial class MainWindow : Window
     {
-        SolidColorBrush[] colors = { Brushes.Red, Brushes.Green, Brushes.Blue };
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
+
+        SolidColorBrush[] colors = { Brushes.Red, Brushes.Green, Brushes.Blue };
+        DispatcherTimer timer1;
+        int t;
+        bool overRed;
+        bool overGreen;
+        bool overBlue;
+
         bool closing = false;
         const int skeletonCount = 6; 
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
+        
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
+
+            t = 3;
+            overRed = false;
+            overGreen = false;
+            overBlue = false;
+
+            timer1 = new DispatcherTimer();
+            timer1.Tick += new EventHandler(timer_Tick);
+            timer1.Interval = new TimeSpan(0, 0, 1);  //this is (hours,minutes,seconds) format
+            timer1.Start();
+
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            label1.Background = Brushes.Black;
+            //label1.Content = "Starting in... " + t;
+            if (t > 0)
+            {
+                t--;
+            }
+            else
+            {
+                timer1.Stop();
+                label1.Content = "";
+                startSequence();
+                //timer.Start();    //Timer for rando clock
+            }
+        }
+
+        void startSequence()
+        {
+            // colors = { Red, Green, Blue }
+            //
+            // after round 1 is successfully completed,
+            //   start random sequence.
+            // round 2+ should start adding another number to the sequence.
+
+            Random random;
+            random = new Random();
+            int rand = random.Next(0, 2);
+            
+            label1.Background = colors.ElementAt(0);
+
+            if (label1.Background.Equals("Red"))
+            {
+                if (overRed == true)
+                {
+                    label1.Background = colors.ElementAt(rand);
+                    rand = random.Next(0, 2);
+                    overRed = false;
+                }
+            }
+            if (label1.Background.Equals("Green"))
+            {
+                if (overGreen == true)
+                {
+                    label1.Background = colors.ElementAt(rand);
+                    rand = random.Next(0, 2);
+                    overGreen = false;
+                }
+            }
+            if (label1.Background.Equals("Blue"))
+            {
+                if (overBlue == true)
+                {
+                    label1.Background = colors.ElementAt(rand);
+                    rand = random.Next(0, 2);
+                    overBlue = false;
+                }
+            }
+
 
         }
 
@@ -85,13 +169,43 @@ namespace SkeletalTracking
             }
         }
 
+        void collison()
+        {
+            //are the hands colliding with the colored circles?
+
+            //finds the center of the circle
+            double redCenterX = Canvas.GetLeft(redCircle) + redCircle.Width / 2;
+            double redCenterY = Canvas.GetTop(redCircle) + redCircle.Height / 2;
+
+            double blueCenterX = Canvas.GetLeft(blueCircle) + blueCircle.Width / 2;
+            double blueCenterY = Canvas.GetTop(blueCircle) + blueCircle.Height / 2;
+
+            double greenCenterX = Canvas.GetLeft(greenCircle) + greenCircle.Width / 2;
+            double greenCenterY = Canvas.GetTop(greenCircle) + greenCircle.Height / 2;
+
+            ////left hand left / top
+            //double leftCenterX = Canvas.GetLeft(leftEllipse) + leftEllipse.Width / 2;
+            //double leftCenterY = Canvas.GetTop(leftEllipse) + leftEllipse.Height / 2;
+
+            //double upperBoundLeft = ellipse1.Width / 2 + leftEllipse.Width / 2;
+            //double actualDistanceLeft = Math.Sqrt(Math.Pow(ellipseCenterX - leftCenterX, 2) 
+            //    + Math.Pow(ellipseCenterY - leftCenterY, 2));
+
+            ////right hand left / top
+            //double rightCenterX = Canvas.GetLeft(rightEllipse) - rightEllipse.Width / 2;
+            //double rightCenterY = Canvas.GetTop(rightEllipse) - rightEllipse.Height / 2;
+
+            //double upperBoundRight = ellipse1.Width / 2 + rightEllipse.Width / 2;
+            //double actualDistanceRight = Math.Sqrt(Math.Pow(ellipseCenterX - rightCenterX, 2) 
+            //    + Math.Pow(ellipseCenterY - rightCenterY, 2));
+
+
+
+        }
+
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            //if kept in AllFramesReady, updates 30 times per second.
-            //Placing the command here will update the color even if there
-            // is not a skeleton detected.
-            label1.Background = colors.ElementAt(1);
-
+            
             if (closing)
             {
                 return;
@@ -105,7 +219,18 @@ namespace SkeletalTracking
                 return; 
             }
 
-            
+            if (redCircle.IsMouseOver == true)
+            {
+                overRed = true;
+            }
+            if (blueCircle.IsMouseOver == true)
+            {
+                overBlue = true;
+            }
+            if (greenCircle.IsMouseOver == true)
+            {
+                overGreen = true;
+            }
             
             
 
