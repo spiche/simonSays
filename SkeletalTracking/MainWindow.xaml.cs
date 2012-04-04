@@ -39,9 +39,11 @@ namespace SkeletalTracking
         SolidColorBrush[] colors = { Brushes.Red, Brushes.Green, Brushes.Blue };
         DispatcherTimer timer1;
         int t;
-        bool overRed;
-        bool overGreen;
-        bool overBlue;
+
+        int color;
+        Random random;
+        int rand;
+        bool enabled = false;
 
         bool closing = false;
         const int skeletonCount = 6; 
@@ -54,21 +56,22 @@ namespace SkeletalTracking
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
 
             t = 3;
-            overRed = false;
-            overGreen = false;
-            overBlue = false;
 
             timer1 = new DispatcherTimer();
             timer1.Tick += new EventHandler(timer_Tick);
             timer1.Interval = new TimeSpan(0, 0, 1);  //this is (hours,minutes,seconds) format
             timer1.Start();
+            color = 0;
+
+                        
+            random = new Random();
+            
 
         }
 
         void timer_Tick(object sender, EventArgs e)
         {
             label1.Background = Brushes.Black;
-            //label1.Content = "Starting in... " + t;
             if (t > 0)
             {
                 t--;
@@ -76,53 +79,31 @@ namespace SkeletalTracking
             else
             {
                 timer1.Stop();
-                label1.Content = "";
-                startSequence();
-                //timer.Start();    //Timer for rando clock
+                label1.Background = colors.ElementAt(0);
             }
         }
 
+        
         void startSequence()
         {
             // colors = { Red, Green, Blue }
-            //
-            // after round 1 is successfully completed,
-            //   start random sequence.
-            // round 2+ should start adding another number to the sequence.
+         
+            if (color == 0)
+            {
+                label1.Background = colors.ElementAt(1);
+                enabled = false;
+            }
+            if (color == 1)
+            {
+                label1.Background = colors.ElementAt(2);
+                enabled = false;
+            }
+            if (color == 2)
+            {
+                label1.Background = colors.ElementAt(0);
+                enabled = false;
+            }
 
-            Random random;
-            random = new Random();
-            int rand = random.Next(0, 2);
-            
-            label1.Background = colors.ElementAt(0);
-
-            if (label1.Background.Equals("Red"))
-            {
-                if (overRed == true)
-                {
-                    label1.Background = colors.ElementAt(rand);
-                    rand = random.Next(0, 2);
-                    overRed = false;
-                }
-            }
-            if (label1.Background.Equals("Green"))
-            {
-                if (overGreen == true)
-                {
-                    label1.Background = colors.ElementAt(rand);
-                    rand = random.Next(0, 2);
-                    overGreen = false;
-                }
-            }
-            if (label1.Background.Equals("Blue"))
-            {
-                if (overBlue == true)
-                {
-                    label1.Background = colors.ElementAt(rand);
-                    rand = random.Next(0, 2);
-                    overBlue = false;
-                }
-            }
 
 
         }
@@ -169,37 +150,85 @@ namespace SkeletalTracking
             }
         }
 
-        void collison()
+        void collision()
         {
             //are the hands colliding with the colored circles?
+
+            double upperBoundRight = 0;
+            double actualDistanceRight = 0;
+            double upperBoundLeft = 0;
+            double actualDistanceLeft = 0;
 
             //finds the center of the circle
             double redCenterX = Canvas.GetLeft(redCircle) + redCircle.Width / 2;
             double redCenterY = Canvas.GetTop(redCircle) + redCircle.Height / 2;
 
-            double blueCenterX = Canvas.GetLeft(blueCircle) + blueCircle.Width / 2;
-            double blueCenterY = Canvas.GetTop(blueCircle) + blueCircle.Height / 2;
-
             double greenCenterX = Canvas.GetLeft(greenCircle) + greenCircle.Width / 2;
             double greenCenterY = Canvas.GetTop(greenCircle) + greenCircle.Height / 2;
 
-            ////left hand left / top
-            //double leftCenterX = Canvas.GetLeft(leftEllipse) + leftEllipse.Width / 2;
-            //double leftCenterY = Canvas.GetTop(leftEllipse) + leftEllipse.Height / 2;
+            double blueCenterX = Canvas.GetLeft(blueCircle) + blueCircle.Width / 2;
+            double blueCenterY = Canvas.GetTop(blueCircle) + blueCircle.Height / 2;
 
-            //double upperBoundLeft = ellipse1.Width / 2 + leftEllipse.Width / 2;
-            //double actualDistanceLeft = Math.Sqrt(Math.Pow(ellipseCenterX - leftCenterX, 2) 
-            //    + Math.Pow(ellipseCenterY - leftCenterY, 2));
+            //finding the center of the left hand ellipse
+            double leftCenterX = Canvas.GetLeft(leftEllipse) + leftEllipse.Width / 2;
+            double leftCenterY = Canvas.GetTop(leftEllipse) + leftEllipse.Height / 2;
 
-            ////right hand left / top
-            //double rightCenterX = Canvas.GetLeft(rightEllipse) - rightEllipse.Width / 2;
-            //double rightCenterY = Canvas.GetTop(rightEllipse) - rightEllipse.Height / 2;
+            //finding the center of the right hand ellipse
+            double rightCenterX = Canvas.GetLeft(rightEllipse) - rightEllipse.Width / 2;
+            double rightCenterY = Canvas.GetTop(rightEllipse) - rightEllipse.Height / 2;
 
-            //double upperBoundRight = ellipse1.Width / 2 + rightEllipse.Width / 2;
-            //double actualDistanceRight = Math.Sqrt(Math.Pow(ellipseCenterX - rightCenterX, 2) 
-            //    + Math.Pow(ellipseCenterY - rightCenterY, 2));
+            //collision with RED
+            if (color == 0)
+            {
+                upperBoundLeft = redCircle.Width / 2 + leftEllipse.Width / 2;
+                actualDistanceLeft = Math.Sqrt(Math.Pow(redCenterX - leftCenterX, 2)
+                    + Math.Pow(redCenterY - leftCenterY, 2));
+                upperBoundRight = redCircle.Width / 2 + rightEllipse.Width / 2;
+                actualDistanceRight = Math.Sqrt(Math.Pow(redCenterX - rightCenterX, 2)
+                    + Math.Pow(redCenterY - rightCenterY, 2));
+            }
+            //collision with GREEN
+            if (color == 1)
+            {
+                upperBoundLeft = greenCircle.Width / 2 + leftEllipse.Width / 2;
+                actualDistanceLeft = Math.Sqrt(Math.Pow(greenCenterX - leftCenterX, 2)
+                    + Math.Pow(greenCenterY - leftCenterY, 2));
+                upperBoundRight = greenCircle.Width / 2 + rightEllipse.Width / 2;
+                actualDistanceRight = Math.Sqrt(Math.Pow(greenCenterX - rightCenterX, 2)
+                    + Math.Pow(greenCenterY - rightCenterY, 2));
+                
+            }
+            //collision with BLUE
+            if (color == 2)
+            {
+                upperBoundLeft = blueCircle.Width / 2 + leftEllipse.Width / 2;
+                actualDistanceLeft = Math.Sqrt(Math.Pow(blueCenterX - leftCenterX, 2)
+                    + Math.Pow(blueCenterY - leftCenterY, 2));
+                upperBoundRight = blueCircle.Width / 2 + rightEllipse.Width / 2;
+                actualDistanceRight = Math.Sqrt(Math.Pow(blueCenterX - rightCenterX, 2)
+                    + Math.Pow(blueCenterY - rightCenterY, 2));
+                
+            }
+
+            if (actualDistanceLeft < upperBoundLeft || actualDistanceRight < upperBoundRight)
+            {
+                enabled = true;
+            }
 
 
+            if (color < 2)
+            {
+                color++;
+            }
+            else
+            {
+                color = 0;
+            }
+
+            if (enabled)
+            {
+                startSequence();
+            }
 
         }
 
@@ -217,29 +246,15 @@ namespace SkeletalTracking
             if (first == null)
             {
                 return; 
-            }
-
-            if (redCircle.IsMouseOver == true)
-            {
-                overRed = true;
-            }
-            if (blueCircle.IsMouseOver == true)
-            {
-                overBlue = true;
-            }
-            if (greenCircle.IsMouseOver == true)
-            {
-                overGreen = true;
-            }
+            }            
             
-            
-
             //set scaled position
-            ScalePosition(headImage, first.Joints[JointType.Head]);
+            //ScalePosition(headImage, first.Joints[JointType.Head]);
             ScalePosition(leftEllipse, first.Joints[JointType.HandLeft]);
             ScalePosition(rightEllipse, first.Joints[JointType.HandRight]);
 
-            GetCameraPoint(first, e); 
+            GetCameraPoint(first, e);
+            collision();
 
         }
 
@@ -254,12 +269,11 @@ namespace SkeletalTracking
                     return;
                 }
 
-                
 
                 //Map a joint location to a point on the depth map
                 //head
-                DepthImagePoint headDepthPoint =
-                    depth.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
+                //DepthImagePoint headDepthPoint =
+                //    depth.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
                 //left hand
                 DepthImagePoint leftDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.HandLeft].Position);
@@ -270,9 +284,9 @@ namespace SkeletalTracking
 
                 //Map a depth point to a point on the color image
                 //head
-                ColorImagePoint headColorPoint =
-                    depth.MapToColorImagePoint(headDepthPoint.X, headDepthPoint.Y,
-                    ColorImageFormat.RgbResolution640x480Fps30);
+                //ColorImagePoint headColorPoint =
+                //    depth.MapToColorImagePoint(headDepthPoint.X, headDepthPoint.Y,
+                //    ColorImageFormat.RgbResolution640x480Fps30);
                 //left hand
                 ColorImagePoint leftColorPoint =
                     depth.MapToColorImagePoint(leftDepthPoint.X, leftDepthPoint.Y,
@@ -284,7 +298,7 @@ namespace SkeletalTracking
 
 
                 //Set location
-                CameraPosition(headImage, headColorPoint);
+                //CameraPosition(headImage, headColorPoint);
                 CameraPosition(leftEllipse, leftColorPoint);
                 CameraPosition(rightEllipse, rightColorPoint);
             }        
@@ -345,10 +359,10 @@ namespace SkeletalTracking
         private void ScalePosition(FrameworkElement element, Joint joint)
         {
             //convert the value to X/Y
-            //Joint scaledJoint = joint.ScaleTo(1280, 720); 
+            Joint scaledJoint = joint.ScaleTo(1280, 720); 
             
             //convert & scale (.3 = means 1/3 of joint distance)
-            Joint scaledJoint = joint.ScaleTo(1280, 720, .3f, .3f);
+           // Joint scaledJoint = joint.ScaleTo(1280, 720, .3f, .3f);
 
             Canvas.SetLeft(element, scaledJoint.Position.X);
             Canvas.SetTop(element, scaledJoint.Position.Y); 

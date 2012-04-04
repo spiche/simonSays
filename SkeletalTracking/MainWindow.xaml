@@ -5,15 +5,14 @@
         xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers" 
         Closing="Window_Closing" WindowState="Maximized">       
     <Canvas Name="MainCanvas">
-        <my:KinectColorViewer Canvas.Left="118" Canvas.Top="90" Width="603" Height="372" Name="kinectColorViewer1" 
+        <my:KinectColorViewer Canvas.Left="0" Canvas.Top="0" Width="603" Height="372" Name="kinectColorViewer1" 
                               Kinect="{Binding ElementName=kinectSensorChooser1, Path=Kinect}" />
         <Ellipse Canvas.Left="0" Canvas.Top="0" Height="50" Name="leftEllipse"  Width="50" Fill="#FF4D298D" Opacity="1" Stroke="White" />
         <Ellipse Canvas.Left="100" Canvas.Top="0" Fill="#FF2CACE3" Height="50" Name="rightEllipse" Width="50" Opacity="1" Stroke="White" />
         <my:KinectSensorChooser Canvas.Left="250" Canvas.Top="380" Name="kinectSensorChooser1" Width="328" />
-        <Image Canvas.Left="66" Canvas.Top="90" Height="87" Name="headImage" Stretch="Fill" Width="84" Source="/SkeletalTracking;component/c4f-color.png" />
-        <Label Canvas.Left="52" Canvas.Top="57" Content="Label" Height="95" Name="label1" Width="168" Background="Black" Foreground="{x:Null}" />
-        <Ellipse Canvas.Left="379" Canvas.Top="97" Height="80" Name="redCircle" Stroke="{x:Null}" Width="82" Fill="Red" />
-        <Ellipse Canvas.Left="175" Canvas.Top="235" Height="80" Name="blueCircle" Stroke="{x:Null}" Width="82" Fill="Blue" />
-        <Ellipse Canvas.Left="586" Canvas.Top="235" Height="80" Name="greenCircle" Stroke="{x:Null}" Width="82" Fill="Lime" />
+        <Label Canvas.Left="0" Canvas.Top="0" Content="Label" Height="95" Name="label1" Width="168" Background="Black" Foreground="{x:Null}" />
+        <Ellipse Canvas.Left="250" Canvas.Top="15" Height="80" Name="redCircle" Stroke="{x:Null}" Width="82" Fill="Red" />
+        <Ellipse Canvas.Left="86" Canvas.Top="194" Height="80" Name="blueCircle" Stroke="{x:Null}" Width="82" Fill="Blue" />
+        <Ellipse Canvas.Left="428" Canvas.Top="194" Height="80" Name="greenCircle" Stroke="{x:Null}" Width="82" Fill="Lime" />
     </Canvas>
 </Window>
